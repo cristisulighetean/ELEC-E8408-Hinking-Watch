@@ -1,13 +1,10 @@
-#include <Arduino.h>
-#include "config.h"
-
 struct Button {
   const uint8_t PIN;
   uint32_t numberKeyPresses;
   bool pressed;
 };
 
-Button button1 = {36, 0, false};
+Button button1 = {18, 0, false};
 
 void IRAM_ATTR isr() {
   button1.numberKeyPresses += 1;
