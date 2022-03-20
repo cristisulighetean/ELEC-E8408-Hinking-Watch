@@ -3,6 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "BluetoothSerial.h"
+
+// Check if Bluetooth configs are enabled
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+// Bluetooth Serial object
+BluetoothSerial SerialBT;
 
 volatile uint8_t state;
 volatile bool irqBMA = false;
@@ -52,9 +61,21 @@ void init_little_fs()
     }
 }
 
-void hiking_session()
-{
+void readFileToBL(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\r\n", path);
 
+    File file = fs.open(path);
+    if(!file || file.isDirectory()){
+        Serial.println("- failed to open file for reading");
+        return;
+    }
+
+    Serial.println("- read from file:");
+    while(file.available()){
+        //Serial.write(file.read());
+        SerialBT.println(file.read()); 
+    }
+    file.close();
 }
 
 void setup()
@@ -88,9 +109,8 @@ void setup()
     watch->power->enableIRQ(AXP202_PEK_SHORTPRESS_IRQ, true);
     watch->power->clearIRQ();
 
-
+    SerialBT.begin("ESP32");
 }
-
 
 
 void loop()
@@ -162,7 +182,6 @@ void loop()
         delay(1000);
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
 
-
         while (1)
         {   
             /* A non-blocking delay. */
@@ -194,14 +213,9 @@ void loop()
 
             /* GPS */
 
-
             /* Distance calculation */
 
-
             /* Saving to file */
-
-
-
 
             delay(20);
 
@@ -228,10 +242,6 @@ void loop()
 
         // Calculate current distance
         
-        // Show them to the user
-        
-        
-        
         break;
     }
     case 4:
@@ -246,13 +256,11 @@ void loop()
         
         char buffer[30];
         itoa(step_count, buffer, 10);
-        Serial.print("Counter: "); Serial.println(step_count);
         Serial.print("Buffer: "); Serial.println(buffer);
         writeFile(LITTLEFS, "/steps.txt", buffer);
         
         while (1)
         {
-
             /*      IRQ     */
             if (irqButton) {
                 irqButton = false;
@@ -277,11 +285,12 @@ void loop()
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
         watch->tft->drawString("Sync", 25, 100);
 
-        readFileBL(LITTLEFS, "/steps.txt");
+        readFileToBL(LITTLEFS, "/steps.txt");
+        SerialBT.println(step_count); 
+        
 
         while (1)
         {
-            // After finish sync or IRQ, go to fist state
 
             /*      IRQ     */
             if (irqButton) {
@@ -303,6 +312,26 @@ void loop()
     case 6:
     {
         /* Bluetooth sync */
+        while (1)
+        {
+            // After finish sync or IRQ, go to fist state
+
+            /*      IRQ     */
+            if (irqButton) {
+                irqButton = false;
+                watch->power->readIRQ();
+                if (state == 6)
+                {
+                    state = 1;
+                }
+                watch->power->clearIRQ();
+            }
+            if (state == 1) {
+                break;
+            }
+        }
+
+        break;
 
     }
     default:
