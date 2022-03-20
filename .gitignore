@@ -1,4 +1,12 @@
 # macOS directory file
 .DS_Store
+
 Watch_TTGo_fw/example_code/
 Watch_TTGo_fw/.vscode
+
+# connect remote with secret
+.connect_remote
+
+# python related
+Pipfile
+__pycache__
