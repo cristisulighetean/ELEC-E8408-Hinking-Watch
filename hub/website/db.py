@@ -1,7 +1,5 @@
 class Database:
-    def __init__(self):
-        pass
-    
+    @staticmethod
     def get_timestamps():
         # sqlite3 fetch data somehow
 
@@ -13,8 +11,8 @@ class Database:
         timestamp_list.append(timestamp1)
         timestamp_list.append(timestamp2)
         timestamp_list.append(timestamp3)
-
         return timestamp_list
 
+    @staticmethod
     def get_session_data(id):
         return {"steps": "2098", "km": "1.34", "kcal": "84"}

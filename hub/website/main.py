@@ -2,10 +2,9 @@ from flask import Flask
 from flask import render_template
 from flask import jsonify
 
-import db as database
+import db
 
 app = Flask(__name__)
-db = database.Database()
 
 @app.route('/')
 def url():
