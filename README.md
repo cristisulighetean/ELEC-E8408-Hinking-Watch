@@ -13,9 +13,9 @@ When the Hub connects successfully to the Watch, it will send one `c` (ASCII cha
 ## Synchronization data
 After pairing, the watch
 ```python
-# id;steps;km;lat1,long1;lat2,long2;...\r\n
-b'4;2425;324;64.83458747762428,24.83458747762428;...,...\r\n'
+# id;steps;km;lat1,long1;lat2,long2;...\n
+b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
 ```
-- The carriage return and the newline represents the end of the session synchronization message
+- The newline represents the end of the session synchronization message
 
 After the Hub successfully receives the session data the Hub sends one `r` (ASCII character) that represents *received*
