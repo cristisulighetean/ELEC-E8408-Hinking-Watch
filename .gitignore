@@ -10,3 +10,6 @@ Watch_TTGo_fw/.vscode
 # python related
 Pipfile
 __pycache__
+
+# sqlite3 database file
+sessions.db
