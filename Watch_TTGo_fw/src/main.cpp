@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cmath>
 
 // Check if Bluetooth configs are enabled
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -30,9 +31,8 @@ volatile uint8_t state;
 volatile bool irqBMA = false;
 volatile bool irqButton = false;
 
-// Distance, step count 
-float distance = 0;
-uint32_t step_count = 0;
+bool sessionStored = false;
+bool sessionSent = false;
 
 void readFileToBL(fs::FS &fs, const char * path){
     Serial.printf("Reading file: %s\r\n", path);
@@ -51,7 +51,7 @@ void readFileToBL(fs::FS &fs, const char * path){
     file.close();
 }
 
-void init_hike_watch()
+void initHikeWatch()
 {
     // LittleFS
     if(!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED)){
@@ -103,20 +103,89 @@ void init_hike_watch()
     return;
 }
 
+void send_data(fs::FS &fs, const char * path)
+{
+    File file = fs.open(path);
+    if(!file || file.isDirectory()){
+        Serial.println("- failed to open file for reading");
+        return;
+    }
+
+    Serial.println("- read from file:");
+    while(file.available()){
+        SerialBT.write(file.read());
+    }
+    file.close();
+}
+
 void sendSession()
 {
     // Read session and send it via SerialBT
+    // Sending the session to the Hub
+    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+    watch->tft->drawString("Sending session", 45, 80);
+    watch->tft->drawString("to Hub", 55, 110);
+
+    // Sending session id
+    send_data(LITTLEFS, "/id.txt");
+    // Sending steps
+    send_data(LITTLEFS, "/steps.txt");
+    // Sending distance
+    send_data(LITTLEFS, "/distance.txt");
+    // Sending coordinates
+    send_data(LITTLEFS, "/coord.txt");
 }
 
 void checkSessionStored()
 {
-    // Check if session was stored
+    // Check if session was stored 
+    // Check for file
 
 }
 
-void calculateDistance()
+float calculateDistance(gpsData current, gpsData past)
 {
     // Calculate distance btw 2 points
+    double p1 = pow((current.lat - past.lat), 2);
+    double p2 = pow((current.lng - past.lng), 2);
+    return (float) sqrt(p1+p2);
+}
+
+void openCoordinatesFile(void)
+{
+    writeFile(LITTLEFS, "/coord.txt", "");
+}
+
+
+int saveCoordinates(gpsData current)
+{   
+    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
+
+    return 0;
+}
+
+void saveIdToFile(uint16_t id)
+{
+    char buffer[10];
+    itoa(id, buffer, 10);
+    writeFile(LITTLEFS, "/id.txt", buffer);
+}
+
+void saveStepsToFile(uint32_t step_count)
+{
+    char buffer[10];
+    itoa(step_count, buffer, 10);
+    writeFile(LITTLEFS, "/steps.txt", buffer);
+}
+
+void saveDistanceToFile(float distance)
+{
+    char buffer[10];
+    itoa(distance, buffer, 10);
+    writeFile(LITTLEFS, "/distance.txt", buffer);
 }
 
 void setup()
@@ -130,7 +199,7 @@ void setup()
     tft = watch->tft;
     sensor = watch->bma;
     
-    init_hike_watch();
+    initHikeWatch();
 
     state = 1;
 
@@ -154,8 +223,6 @@ void loop()
         watch->tft->drawString("Press button", 50, 80);
         watch->tft->drawString("to start session", 40, 110);
 
-        bool sessionStored = false;
-        bool sessionSent = false;
         // Check if we have a stored session
 
         // If we have a session
@@ -178,9 +245,12 @@ void loop()
                     sessionSent = true;
                 }
                 // TODO verify if receive char is r
+                // Timeout to check received 
                 if (sessionSent && incomingChar == 'r')
                 {
                     Serial.println("Session successfuly send via BT");
+                    // TODO
+                    // Delete session
                 }
             }
 
@@ -211,9 +281,6 @@ void loop()
 
         // Do the initializations
         delay(1000); 
-
-        distance = 0;
-        step_count = 0;
 
         // Clear screen
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
@@ -248,11 +315,14 @@ void loop()
         last = millis();
 
         // Lat long
-        float lat = 0;
-        float lng = 0;
-        float past_lat = 0;
-        float past_lng = 0;
-        bool coord_printed = false;
+        gpsData gps_current;
+        gpsData gps_past;
+        float distance = 0;
+        float past_distance = 0;
+        uint32_t step_count = 0;
+
+        // Open coordinates file
+        //openCoordinatesFile();
 
         while (1)
         {   
@@ -260,46 +330,43 @@ void loop()
             // Get position
             if (gps->location.isUpdated()) {
                 updateTimeout = millis();
-                lat = gps->location.lat();
-                lng = gps->location.lng();
-
-                watch->tft->setCursor(45, 130);
-                watch->tft->print("Valid GPS");
-                watch->tft->setCursor(45, 160);
-                watch->tft->print(lat);
-                watch->tft->setCursor(45, 190);
-                watch->tft->print(lng);
-
+                gps_current.lat = gps->location.lat();
+                gps_current.lng = gps->location.lng();
             } else {
                 if (millis() - updateTimeout > 3000) {
                     updateTimeout = millis();
-
-                    Serial.println("Invalid location");
-
                     watch->tft->setCursor(45, 130);
-                    watch->tft->print("Invalid GPS");
-
+                    watch->tft->print("No GPS data");
                 }
             }
 
-            if (lat != past_lat && lng != past_lng)
+            // Update past position if different and save to file
+            if (gps_current.lat != gps_past.lat && gps_current.lng != gps_past.lng)
             {
-                Serial.print("LAT: ");Serial.print(lat);
-                Serial.print(" LNG: ");Serial.print(lng);
+                Serial.print("LAT: ");Serial.print(gps_current.lat);
+                Serial.print(" LNG: ");Serial.print(gps_current.lng);
                 Serial.println();
 
-                past_lat = lat;
-                past_lng = lng;
+                distance += calculateDistance(gps_current, gps_past); 
+
+                // Save coordinates to file
+                saveCoordinates(gps_current); 
+
+                gps_past.lat = gps_current.lat;
+                gps_past.lng = gps_current.lng;
             }
+            
+            // Display distance
+            if (distance != past_distance)
+            {
+                watch->tft->setCursor(45, 100);
+                watch->tft->print("Distance: ");
+                watch->tft->print("%2.2f");
+                watch->tft->print(" km");
 
-            // If the coord are the same drop them 
-            // else save to coord.txt
-
-            // Calculate distance
-
-            // Add to current distance and display it to user
-
-
+                past_distance = distance;
+            }
+            
             /* Step counter */
             if (irqBMA) {
                 irqBMA = false;
@@ -314,8 +381,6 @@ void loop()
                 if (sensor->isStepCounter()) {
                     // incremement step count
                     step_count++;
-                    // TODO
-                    // Remove the step count - fill black rect
 
                     // Get step data from register
                     watch->tft->setTextColor(TFT_WHITE, TFT_BLACK);
@@ -340,106 +405,39 @@ void loop()
                 watch->power->clearIRQ();
             }
             if (state == 4) {
+                // Save steps and distance
+                saveIdToFile(69);
+                saveStepsToFile(step_count);
+                saveDistanceToFile(distance);
+                sessionStored = true;
+
                 break;
             }
-                
         }
         break;
     }
     case 4:
     {
-        // Saving id, steps and distance in different files 
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("Saving hike", 25, 100);
-        
-        char buffer[30];
-        itoa(step_count, buffer, 10);
-        Serial.print("Buffer: "); Serial.println(buffer);
-        writeFile(LITTLEFS, "/steps.txt", buffer);
-        
-        Serial.println(state);
-
-        while (1)
-        {
-            if (SerialBT.available()){
-                char incomingChar = SerialBT.read();
-                Serial.println(incomingChar);
-            }    
-            /*      IRQ     */
-            if (irqButton) {
-                irqButton = false;
-                watch->power->readIRQ();
-                if (state == 4)
-                {
-                    state = 5;
-                }
-                watch->power->clearIRQ();
-            }
-            if (state == 5) {
-                break;
-            }
-        }
-        
+        watch->tft->drawString("Ending hike", 45, 100);
+        delay(1000);
+        state = 1;  
         break;
     }
-
     case 5:
     {
+        // Sending the session to the Hub
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("State 5", 25, 100);
+        watch->tft->drawString("Sending session", 45, 80);
+        watch->tft->drawString("to Hub", 55, 110);
 
-        Serial.println(state);
-
-
-        while (1)
-        {
-            /*      IRQ     */
-            if (irqButton) {
-                irqButton = false;
-                watch->power->readIRQ();
-                if (state == 5)
-                {
-                    state = 6;
-                }
-                watch->power->clearIRQ();
-            }
-            if (state == 6) {
-                break;
-            }
-        }
-
-        break;
-    }
-    case 6:
-    {
-        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("State 6", 25, 100);
-
-        Serial.println(state);
-
-        while (1)
-        {
-            // After finish sync or IRQ, go to fist state
-
-            /*      IRQ     */
-            if (irqButton) {
-                irqButton = false;
-                watch->power->readIRQ();
-                if (state == 6)
-                {
-                    state = 1;
-                }
-                watch->power->clearIRQ();
-            }
-            if (state == 1) {
-                break;
-            }
-        }
-
+        state = 1;
         break;
 
     }
     default:
+        // Restart watch
+        ESP.restart();
         break;
     }
 }

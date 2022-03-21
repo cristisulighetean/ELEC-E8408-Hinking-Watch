@@ -16,3 +16,11 @@ void deleteFile(fs::FS &fs, const char * path);
 void writeFile2(fs::FS &fs, const char * path, const char * message);
 void deleteFile2(fs::FS &fs, const char * path);
 void testFileIO(fs::FS &fs, const char * path);
+
+struct gpsData {
+    float lat = 0;
+    float lng = 0;
+    int32_t altitude = 0;
+    uint32_t satellites_age = 0;
+    uint32_t satellites_value = 0;
+};
