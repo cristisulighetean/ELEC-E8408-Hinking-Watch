@@ -12,6 +12,9 @@ class HikeSession:
     def calc_kcal(self):
         self.kcal = MET_HIKING * KCAL_PER_STEP * self.steps
 
+    def __repr__(self):
+        return f"HikeSession{{{self.id}, {self.km}(km), {self.steps}(steps), {self.kcal}(kcal)}}"
+
 def from_list(l: list):
     s = HikeSession()
     s.id = l[0]
