@@ -29,6 +29,7 @@ class HubDatabase:
         for t in (DB_SESSION_TABLE, DB_COORDINATE_TABLE):
             create_table_sql = f"create table if not exists {t['name']} ({', '.join(t['cols'])})"
             self.cur.execute(create_table_sql)
+
         self.con.commit()
 
     def save(self, s: hike.HikeSession):
