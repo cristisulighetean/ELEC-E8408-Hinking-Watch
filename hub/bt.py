@@ -6,16 +6,18 @@ import hike
 class HubBluetooth:
     WATCH_BT_MAC = '44:17:93:88:D1:D2'
     WATCH_BT_PORT = 700
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
     connected = False
+    sock = None
     
     def wait_for_connection(self):
         if not self.connected:
             # try to connect every sec while connection is made
             while True:
                 try:
+                    self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                     self.sock.connect((self.WATCH_BT_MAC, self.WATCH_BT_PORT))
                     self.connected = True
+                    self.sock.send('c')
                     break
                 except bluetooth.btcommon.BluetoothError:
                     time.sleep(1)
@@ -39,9 +41,10 @@ class HubBluetooth:
                 if len(messages):
                     sessions = HubBluetooth.messages_to_sessions(messages)
                     callback(sessions)
+                    self.sock.send('r')
         except KeyboardInterrupt:
             raise Exception("Shutting down server.")
-        except:
+        except bluetooth.btcommon.BluetoothError:
             self.connected = False
             # TODO handle when connection goes down
         finally:
@@ -54,7 +57,8 @@ class HubBluetooth:
             # b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
             m = m.decode('utf-8')
 
-            parts = m.split(';')
+            # filtering because we might have a semi-column at the end of the message, right before the new-line character
+            parts = list(filter(lambda p: len(p) > 0, m.split(';')))
             assert len(parts) >= 4, f"MessageProcessingError -> The incoming message doesn't contain enough information: {m}"
 
             hs = hike.HikeSession()
