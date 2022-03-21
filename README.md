@@ -11,7 +11,11 @@ Hub: `B8:27:EB:64:86:8D`
 When the Hub connects successfully to the Watch, it will send one `c` (ASCII character) to notify the Watch of the connection.
 
 ## Synchronization data
-After pairing, the watch
+After pairing, the Watch will send the hiking session to the Hub, if any hiking session is recorded.
+If the session was successfully send to the Hub, the Watch will delete it.
+The Watch can only synchronize if it is not recording any session.
+
+The following represents the message that the Watch will send to the Hub.
 ```python
 # id;steps;km;lat1,long1;lat2,long2;...\n
 b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
