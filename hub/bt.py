@@ -85,22 +85,22 @@ class HubBluetooth:
         return list(map(mtos, messages))
 
 
-"""
-A simple Python script to send messages to a sever over Bluetooth
-using PyBluez (with Python 2).
-"""
+# """
+# A simple Python script to send messages to a sever over Bluetooth
+# using PyBluez (with Python 2).
+# """
 
-import bluetooth
-import time
+# import bluetooth
+# import time
 
-serverMACAddress = '44:17:93:88:D1:D2'
-port = 1
-s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-s.connect((serverMACAddress, port))
+# serverMACAddress = '44:17:93:88:D1:D2'
+# port = 1
+# s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+# s.connect((serverMACAddress, port))
 
-print("connection has been made! yeah")
+# print("connection has been made! yeah")
 
 
 
-for i in range(10):
-    time.sleep(0.2)
+# for i in range(10):
+#     time.sleep(0.2)
