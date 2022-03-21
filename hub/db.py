@@ -36,7 +36,7 @@ class HubDatabase:
         self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
         
         for c in s.coords:
-            self.cur.execute(f"INSERT INTO {DB_COORDINATE_TABLE['name']} VALUES ({c[0], c[1]})")
+            self.cur.execute(f"INSERT INTO {DB_COORDINATE_TABLE['name']} VALUES ({s.id}, {c[0]}, {c[1]})")
 
         self.con.commit()
 
