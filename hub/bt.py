@@ -5,7 +5,7 @@ import hike
 
 class HubBluetooth:
     WATCH_BT_MAC = '44:17:93:88:D1:D2'
-    WATCH_BT_PORT = 700
+    WATCH_BT_PORT = 1
     connected = False
     sock = None
     
