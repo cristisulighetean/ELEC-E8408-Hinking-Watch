@@ -51,11 +51,12 @@ class HubBluetooth:
                     self.sock.send('r')
                     print("Incoming session saved. Sent confirmation to Watch!")
             except KeyboardInterrupt:
-                raise Exception("Shutting down server.")
+                raise KeyboardInterrupt("Shutting down server.")
             except bluetooth.btcommon.BluetoothError as bt_err:
                 if bt_err.errno == 11: # connection down
                     self.connected = False
                     self.sock.close()
+                    print("Lost connection with the watch.")
                     break
                 elif bt_err.errno == None: # possibly occured by socket.settimeout
                     self.sock.send('c')
