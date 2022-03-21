@@ -42,7 +42,7 @@ class HubDatabase:
 
         self.con.commit()
 
-    def delete(self, session_id):
+    def delete(self, session_id: int):
         self.cur.execute(f"DELETE FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}")
         self.cur.execute(f"DELETE FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}")
         self.con.commit()
@@ -51,7 +51,11 @@ class HubDatabase:
         rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
         return list(map(lambda r: hike.from_list(r), rows))
 
-    def get_coordinates(self, session_id):
+    def get_session(self, session_id: int):
+        rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        return list(map(lambda r: hike.from_list(r), rows))
+
+    def get_coordinates(self, session_id: int):
         return self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
 
     def __del__(self):
