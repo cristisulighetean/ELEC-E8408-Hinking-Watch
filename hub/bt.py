@@ -37,13 +37,16 @@ class HubBluetooth:
         while True:
             try:
                 chunk = self.sock.recv(1024)
+                print(f"Received data: {chunk}")
 
                 messages = chunk.split(b'\n')
                 messages[0] = remainder + messages[0]
                 remainder = messages.pop()
 
                 if len(messages):
+                    print(f"received messages: {messages}")
                     sessions = HubBluetooth.messages_to_sessions(messages)
+                    print(f"Saved sessions: {sessions}")
                     callback(sessions)
                     self.sock.send('r')
                     print("Incoming session saved. Sent confirmation to Watch!")
@@ -56,6 +59,7 @@ class HubBluetooth:
                     break
                 elif bt_err.errno == None: # possibly occured by socket.settimeout
                     self.sock.send('c')
+                    print("Reminder has been sent to the Watch about the attempt of the synchronization.")
 
     @staticmethod
     def messages_to_sessions(messages: list[bytes]) -> list[hike.HikeSession]:
