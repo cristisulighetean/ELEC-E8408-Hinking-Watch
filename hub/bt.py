@@ -36,8 +36,9 @@ class HubBluetooth:
                 messages[0] = remainder + messages[0]
                 remainder = messages.pop()
 
-                sessions = HubBluetooth.messages_to_sessions(messages)
-                callback(sessions)
+                if len(messages):
+                    sessions = HubBluetooth.messages_to_sessions(messages)
+                    callback(sessions)
         except KeyboardInterrupt:
             raise Exception("Shutting down server.")
         except:
@@ -49,8 +50,8 @@ class HubBluetooth:
     @staticmethod
     def messages_to_sessions(messages: list[bytes]) -> list[hike.HikeSession]:
         def mtos(m: bytes) -> hike.HikeSession:
-            # id;steps;km;lat1,long1;lat2,long2;...\r\n
-            # b'4;2425;324;64.83458747762428,24.83458747762428;...,...\r\n'
+            # id;steps;km;lat1,long1;lat2,long2;...\n
+            # b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
             m = m.decode('utf-8')
 
             parts = m.split(';')
@@ -71,4 +72,3 @@ class HubBluetooth:
             return hs
 
         return list(map(mtos, messages))
-

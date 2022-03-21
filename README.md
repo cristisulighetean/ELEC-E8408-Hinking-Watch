@@ -19,3 +19,4 @@ b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
 - The newline represents the end of the session synchronization message
 
 After the Hub successfully receives the session data the Hub sends one `r` (ASCII character) that represents *received*
+(The watch should have a timeout of e.g., 10 seconds.)
