@@ -32,7 +32,10 @@ class HubDatabase:
         self.con.commit()
 
     def save(self, s: hike.HikeSession):
-        self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
+        try:
+            self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
+        except sqlite3.IntegrityError:
+            print("WARNING: Session ID already exists in database! Aborting saving current session.")
         
         for c in s.coords:
             self.cur.execute(f"INSERT INTO {DB_COORDINATE_TABLE['name']} VALUES ({s.id}, {c[0]}, {c[1]})")

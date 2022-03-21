@@ -18,3 +18,4 @@ def from_list(l: list):
     s.km = l[1]
     s.steps = l[2]
     s.kcal = l[3]
+    return s
