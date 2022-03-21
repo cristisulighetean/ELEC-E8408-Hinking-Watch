@@ -19,13 +19,11 @@ TFT_eSPI *tft;
 BMA *sensor;
 TinyGPSPlus *gps=nullptr;
 
-/************ Might not need ************/
-// 
+// GPS var
 uint32_t last = 0;
 uint32_t updateTimeout = 0;
 
-/***************************************/
-
+uint32_t sessionId = 0;
 
 volatile uint8_t state;
 volatile bool irqBMA = false;
@@ -123,15 +121,18 @@ void sendSession()
     // Read session and send it via SerialBT
     // Sending the session to the Hub
     watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-    watch->tft->drawString("Sending session", 45, 80);
-    watch->tft->drawString("to Hub", 55, 110);
+    watch->tft->drawString("Sending session", 20, 80);
+    watch->tft->drawString("to Hub", 80, 110);
 
     // Sending session id
     send_data(LITTLEFS, "/id.txt");
+    SerialBT.write(';');
     // Sending steps
     send_data(LITTLEFS, "/steps.txt");
+    SerialBT.write(';');
     // Sending distance
     send_data(LITTLEFS, "/distance.txt");
+    SerialBT.write(';');
     // Sending coordinates
     send_data(LITTLEFS, "/coord.txt");
 }
@@ -151,20 +152,19 @@ float calculateDistance(gpsData current, gpsData past)
     return (float) sqrt(p1+p2);
 }
 
-void openCoordinatesFile(void)
-{
-    writeFile(LITTLEFS, "/coord.txt", "");
+void saveCoordinatesDummy(void)
+{   
+    appendFile(LITTLEFS, "/coord.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/coord.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/coord.txt", "64.83458747762428,24.83458747762428;");
+    appendFile(LITTLEFS, "/coord.txt", "64.83458747762428,24.83458747762428;");
 }
 
-
-int saveCoordinates(gpsData current)
-{   
-    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
-    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
-    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
-    appendFile(LITTLEFS, "/steps.txt", "64.83458747762428,24.83458747762428;");
-
-    return 0;
+void saveCoordinates(gpsData current)
+{
+    char buf [100];
+    sprintf(buf, "%3.14f,%3.14f;", current.lat, current.lng);
+    writeFile(LITTLEFS, "/coord.txt", buf);
 }
 
 void saveIdToFile(uint16_t id)
@@ -186,6 +186,14 @@ void saveDistanceToFile(float distance)
     char buffer[10];
     itoa(distance, buffer, 10);
     writeFile(LITTLEFS, "/distance.txt", buffer);
+}
+
+void deleteSession()
+{
+    deleteFile(LITTLEFS, "/id.txt");
+    deleteFile(LITTLEFS, "/distance.txt");
+    deleteFile(LITTLEFS, "/steps.txt");
+    deleteFile(LITTLEFS, "/coord.txt");
 }
 
 void setup()
@@ -241,16 +249,26 @@ void loop()
                     // Send session via bluetooth
                     sendSession();
                     // Send connection termination char
-                    SerialBT.write('c');
+                    SerialBT.write('\n');
                     sessionSent = true;
+
+                    // Dummy delay
+                    delay(1000);
+                    // Print new message to user
+                    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+                    watch->tft->drawString("Hiking Watch",  45, 25, 4);
+                    watch->tft->drawString("Press button", 50, 80);
+                    watch->tft->drawString("to start session", 40, 110);
                 }
                 // TODO verify if receive char is r
                 // Timeout to check received 
                 if (sessionSent && incomingChar == 'r')
                 {
                     Serial.println("Session successfuly send via BT");
-                    // TODO
                     // Delete session
+                    deleteSession();
+                    sessionStored = false;
+                    sessionSent = false;
                 }
             }
 
@@ -320,9 +338,10 @@ void loop()
         float distance = 0;
         float past_distance = 0;
         uint32_t step_count = 0;
+        sessionId += 1;
 
         // Open coordinates file
-        //openCoordinatesFile();
+        saveCoordinatesDummy();
 
         while (1)
         {   
@@ -350,7 +369,7 @@ void loop()
                 distance += calculateDistance(gps_current, gps_past); 
 
                 // Save coordinates to file
-                saveCoordinates(gps_current); 
+                saveCoordinatesDummy(); 
 
                 gps_past.lat = gps_current.lat;
                 gps_past.lng = gps_current.lng;
@@ -361,7 +380,9 @@ void loop()
             {
                 watch->tft->setCursor(45, 100);
                 watch->tft->print("Distance: ");
-                watch->tft->print("%2.2f");
+                char buf[20];
+                sprintf(buf, "%2.2f", distance);
+                watch->tft->print(buf);
                 watch->tft->print(" km");
 
                 past_distance = distance;
@@ -406,11 +427,10 @@ void loop()
             }
             if (state == 4) {
                 // Save steps and distance
-                saveIdToFile(69);
+                saveIdToFile(sessionId);
                 saveStepsToFile(step_count);
                 saveDistanceToFile(distance);
                 sessionStored = true;
-
                 break;
             }
         }
