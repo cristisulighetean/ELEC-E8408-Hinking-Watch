@@ -5,7 +5,6 @@ import hike
 DB_COORDINATE_TABLE = {
     "name": "coordinates",
     "cols": [
-        "coordinate_id INTEGER PRIMARY KEY",
         "session_id INTEGER NOT NULL",
         "lat REAL",
         "long REAL",
