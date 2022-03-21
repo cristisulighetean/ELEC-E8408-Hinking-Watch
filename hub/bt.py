@@ -13,11 +13,13 @@ class HubBluetooth:
         if not self.connected:
             # try to connect every sec while connection is made
             while True:
+                print("Waiting for connection...")
                 try:
                     self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                     self.sock.connect((self.WATCH_BT_MAC, self.WATCH_BT_PORT))
                     self.connected = True
                     self.sock.send('c')
+                    print("Connected to Watch!")
                     break
                 except bluetooth.btcommon.BluetoothError:
                     time.sleep(1)
@@ -30,6 +32,7 @@ class HubBluetooth:
 
     def synchronize(self, callback):
         try:
+            print("Synchronizing with watch...")
             remainder = b''
             while True:
                 chunk = self.sock.recv(1024)
@@ -42,6 +45,7 @@ class HubBluetooth:
                     sessions = HubBluetooth.messages_to_sessions(messages)
                     callback(sessions)
                     self.sock.send('r')
+                    print("Incoming session saved. Sent confirmation to Watch!")
         except KeyboardInterrupt:
             raise Exception("Shutting down server.")
         except bluetooth.btcommon.BluetoothError:

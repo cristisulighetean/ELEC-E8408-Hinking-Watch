@@ -14,6 +14,7 @@ def process_sessions(sessions: list[hike.HikeSession]):
         hubdb.save(s)
 
 def main():
+    print("Starting Bluetooth receiver.")
     try:
         while True:
             hubbt.wait_for_connection()
