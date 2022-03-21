@@ -4,7 +4,7 @@ Mini project from the ELEC-E8408 course which consists of a TTGO-Watch-2020-V2 a
 
 # Bluetooth communication between the Hub and the Watch 
 ## MAC addresses
-Watch: `44:17:93:88:D1:D2`
+Watch: `44:17:93:88:D1:D2`  
 Hub: `B8:27:EB:64:86:8D`
 
 ## Pairing
