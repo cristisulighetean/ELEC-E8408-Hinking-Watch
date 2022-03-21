@@ -44,12 +44,15 @@ class HubBluetooth:
                 remainder = messages.pop()
 
                 if len(messages):
-                    print(f"received messages: {messages}")
-                    sessions = HubBluetooth.messages_to_sessions(messages)
-                    print(f"Saved sessions: {sessions}")
-                    callback(sessions)
-                    self.sock.send('r')
-                    print("Incoming session saved. Sent confirmation to Watch!")
+                    try:
+                        print(f"received messages: {messages}")
+                        sessions = HubBluetooth.messages_to_sessions(messages)
+                        print(f"Saved sessions: {sessions}")
+                        callback(sessions)
+                        self.sock.send('r')
+                        print("Incoming session saved. Sent confirmation to Watch!")
+                    except (AssertionError, ValueError):
+                        print("Message was corrupted. Aborting...")
             except KeyboardInterrupt:
                 raise KeyboardInterrupt("Shutting down server.")
             except bluetooth.btcommon.BluetoothError as bt_err:
