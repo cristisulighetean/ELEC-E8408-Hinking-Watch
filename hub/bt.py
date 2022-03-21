@@ -17,6 +17,7 @@ class HubBluetooth:
                 try:
                     self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                     self.sock.connect((self.WATCH_BT_MAC, self.WATCH_BT_PORT))
+                    self.sock.settimeout(2)
                     self.connected = True
                     self.sock.send('c')
                     print("Connected to Watch!")
@@ -31,10 +32,10 @@ class HubBluetooth:
         print("WARNING Hub: the has already connected via Bluetooth.")
 
     def synchronize(self, callback):
-        try:
-            print("Synchronizing with watch...")
-            remainder = b''
-            while True:
+        print("Synchronizing with watch...")
+        remainder = b''
+        while True:
+            try:
                 chunk = self.sock.recv(1024)
 
                 messages = chunk.split(b'\n')
@@ -46,13 +47,15 @@ class HubBluetooth:
                     callback(sessions)
                     self.sock.send('r')
                     print("Incoming session saved. Sent confirmation to Watch!")
-        except KeyboardInterrupt:
-            raise Exception("Shutting down server.")
-        except bluetooth.btcommon.BluetoothError:
-            self.connected = False
-            # TODO handle when connection goes down
-        finally:
-            self.sock.close()
+            except KeyboardInterrupt:
+                raise Exception("Shutting down server.")
+            except bluetooth.btcommon.BluetoothError as bt_err:
+                if bt_err.errno == 11: # connection down
+                    self.connected = False
+                    self.sock.close()
+                    break
+                elif bt_err.errno == None: # possibly occured by socket.settimeout
+                    self.sock.send('c')
 
     @staticmethod
     def messages_to_sessions(messages: list[bytes]) -> list[hike.HikeSession]:
@@ -80,3 +83,24 @@ class HubBluetooth:
             return hs
 
         return list(map(mtos, messages))
+
+
+"""
+A simple Python script to send messages to a sever over Bluetooth
+using PyBluez (with Python 2).
+"""
+
+import bluetooth
+import time
+
+serverMACAddress = '44:17:93:88:D1:D2'
+port = 1
+s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+s.connect((serverMACAddress, port))
+
+print("connection has been made! yeah")
+
+
+
+for i in range(10):
+    time.sleep(0.2)
