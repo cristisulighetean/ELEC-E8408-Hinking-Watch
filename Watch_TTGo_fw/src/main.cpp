@@ -1,9 +1,4 @@
 #include "config.h"
-#include "BluetoothSerial.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
 
 // Check if Bluetooth configs are enabled
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -23,7 +18,7 @@ TinyGPSPlus *gps=nullptr;
 uint32_t last = 0;
 uint32_t updateTimeout = 0;
 
-uint32_t sessionId = 0;
+uint32_t sessionId = 10;
 
 volatile uint8_t state;
 volatile bool irqBMA = false;
@@ -31,23 +26,6 @@ volatile bool irqButton = false;
 
 bool sessionStored = false;
 bool sessionSent = false;
-
-void readFileToBL(fs::FS &fs, const char * path){
-    Serial.printf("Reading file: %s\r\n", path);
-
-    File file = fs.open(path);
-    if(!file || file.isDirectory()){
-        Serial.println("- failed to open file for reading");
-        return;
-    }
-
-    Serial.println("- read from file:");
-    while(file.available()){
-        //Serial.write(file.read());
-        SerialBT.println(file.read()); 
-    }
-    file.close();
-}
 
 void initHikeWatch()
 {
@@ -101,14 +79,14 @@ void initHikeWatch()
     return;
 }
 
-void send_data(fs::FS &fs, const char * path)
+void sendDataBT(fs::FS &fs, const char * path)
 {
+    /* Sends data via SerialBT */
     File file = fs.open(path);
     if(!file || file.isDirectory()){
         Serial.println("- failed to open file for reading");
         return;
     }
-
     Serial.println("- read from file:");
     while(file.available()){
         SerialBT.write(file.read());
@@ -116,32 +94,24 @@ void send_data(fs::FS &fs, const char * path)
     file.close();
 }
 
-void sendSession()
+void sendSessionBT()
 {
     // Read session and send it via SerialBT
-    // Sending the session to the Hub
     watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
     watch->tft->drawString("Sending session", 20, 80);
     watch->tft->drawString("to Hub", 80, 110);
 
     // Sending session id
-    send_data(LITTLEFS, "/id.txt");
+    sendDataBT(LITTLEFS, "/id.txt");
     SerialBT.write(';');
     // Sending steps
-    send_data(LITTLEFS, "/steps.txt");
+    sendDataBT(LITTLEFS, "/steps.txt");
     SerialBT.write(';');
     // Sending distance
-    send_data(LITTLEFS, "/distance.txt");
+    sendDataBT(LITTLEFS, "/distance.txt");
     SerialBT.write(';');
     // Sending coordinates
-    send_data(LITTLEFS, "/coord.txt");
-}
-
-void checkSessionStored()
-{
-    // Check if session was stored 
-    // Check for file
-
+    sendDataBT(LITTLEFS, "/coord.txt");
 }
 
 float calculateDistance(gpsData current, gpsData past)
@@ -214,7 +184,6 @@ void setup()
     SerialBT.begin("Hiking Watch");
 }
 
-
 void loop()
 {
     watch->gpsHandler();
@@ -231,13 +200,6 @@ void loop()
         watch->tft->drawString("Press button", 50, 80);
         watch->tft->drawString("to start session", 40, 110);
 
-        // Check if we have a stored session
-
-        // If we have a session
-        // Print on the watch that we sync and download session to hub
-        
-        Serial.println(state);
-
         while (1)
         {
             /* code */
@@ -247,7 +209,7 @@ void loop()
                 char incomingChar = SerialBT.read();
                 if (incomingChar == 'c' and sessionStored and not sessionSent){
                     // Send session via bluetooth
-                    sendSession();
+                    sendSessionBT();
                     // Send connection termination char
                     SerialBT.write('\n');
                     sessionSent = true;
@@ -260,11 +222,9 @@ void loop()
                     watch->tft->drawString("Press button", 50, 80);
                     watch->tft->drawString("to start session", 40, 110);
                 }
-                // TODO verify if receive char is r
-                // Timeout to check received 
+
                 if (sessionSent && incomingChar == 'r')
                 {
-                    Serial.println("Session successfuly send via BT");
                     // Delete session
                     deleteSession();
                     sessionStored = false;
@@ -291,41 +251,23 @@ void loop()
     case 2:
     {
         /* Hiking session initalisation */
-        Serial.println(state);
-
-        // Clear screen
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
         watch->tft->drawString("Initializing watch", 25, 100);
-
-        // Do the initializations
         delay(1000); 
-
-        // Clear screen
-        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-
         state = 3;
-
         break;
     }
     case 3:
     {
         /* Hiking session ongoing */
-        Serial.println(state);
 
-        // Reset steps count
-        sensor->resetStepCounter();
-
-        // Setup
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
         watch->tft->drawString("Starting hike", 45, 100);
         delay(1000);
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        
-        watch->tft->setCursor(45, 40);
-        watch->tft->print("Step Int: 0");
 
         watch->tft->setCursor(45, 70);
-        watch->tft->print("Step API: 0");
+        watch->tft->print("Steps: 0");
 
         watch->tft->setCursor(45, 100);
         watch->tft->print("Distance: 0 km");
@@ -339,18 +281,23 @@ void loop()
         float past_distance = 0;
         uint32_t step_count = 0;
         sessionId += 1;
-
-        // Open coordinates file
-        saveCoordinatesDummy();
+        sensor->resetStepCounter();
 
         while (1)
         {   
             /* GPS */
-            // Get position
             if (gps->location.isUpdated()) {
                 updateTimeout = millis();
                 gps_current.lat = gps->location.lat();
                 gps_current.lng = gps->location.lng();
+
+                watch->tft->setCursor(45, 130);
+                char lat[30]; sprintf(lat, "LAT: %2.6f", gps_current.lat);
+                watch->tft->print(lat);
+
+                watch->tft->setCursor(45, 160);
+                char lng[30]; sprintf(lng, "LNG: %2.6f", gps_current.lng);
+                watch->tft->print(lng);
             } else {
                 if (millis() - updateTimeout > 3000) {
                     updateTimeout = millis();
@@ -359,17 +306,13 @@ void loop()
                 }
             }
 
-            // Update past position if different and save to file
+            // Update covered distance & save to file
             if (gps_current.lat != gps_past.lat && gps_current.lng != gps_past.lng)
             {
-                Serial.print("LAT: ");Serial.print(gps_current.lat);
-                Serial.print(" LNG: ");Serial.print(gps_current.lng);
-                Serial.println();
-
                 distance += calculateDistance(gps_current, gps_past); 
 
                 // Save coordinates to file
-                saveCoordinatesDummy(); 
+                saveCoordinates(gps_current); 
 
                 gps_past.lat = gps_current.lat;
                 gps_past.lng = gps_current.lng;
@@ -400,17 +343,10 @@ void loop()
 
                 // Check if it is a step interrupt
                 if (sensor->isStepCounter()) {
-                    // incremement step count
-                    step_count++;
-
                     // Get step data from register
-                    watch->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-                    watch->tft->setCursor(45, 40);
-                    watch->tft->print("Step Int: ");
-                    watch->tft->print(step_count);
-
+                    step_count = sensor->getCounter();
                     watch->tft->setCursor(45, 70);
-                    watch->tft->print("Step API: ");
+                    watch->tft->print("Steps: ");
                     watch->tft->print(sensor->getCounter());
                 }
             }
@@ -443,17 +379,6 @@ void loop()
         delay(1000);
         state = 1;  
         break;
-    }
-    case 5:
-    {
-        // Sending the session to the Hub
-        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("Sending session", 45, 80);
-        watch->tft->drawString("to Hub", 55, 110);
-
-        state = 1;
-        break;
-
     }
     default:
         // Restart watch
