@@ -3,7 +3,6 @@ import colorsys
 import time
 import unicornhathd
 import sys
-import hike
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -12,65 +11,58 @@ except ImportError:
 
 hdb = db.HubDatabase()
 
-past_element = hike.HikeSession()
-past_element.id = -1
-
 while True:
     
     current_element = hdb.get_sessions()[-1] # this retreives the last element
+
+    lines = [f"Steps: {current_element.steps}",
+                    f"Distance: {current_element.km}",
+                    f"Kcal: {current_element.kcal}"]
+
+    colour = (255, 0, 0)
+    FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
     
-    if current_element.id != past_element.id:
+    unicornhathd.rotation(270)
+    unicornhathd.brightness(0.6)
 
-        lines = [f"Steps: {current_element.steps}",
-                        f"Distance: {current_element.km}",
-                        f"Kcal: {current_element.kcal}"]
+    width, height = unicornhathd.get_shape()
 
-        colour = (255, 0, 0)
-        FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
-        
-        unicornhathd.rotation(270)
-        unicornhathd.brightness(0.6)
+    text_x = width
+    text_y = 2
 
-        width, height = unicornhathd.get_shape()
+    font_file, font_size = FONT
+    font = ImageFont.truetype(font_file, font_size)
+    text_width, text_height = width, 0
 
-        text_x = width
-        text_y = 2
+    try:
+        for line in lines:
+            w, h = font.getsize(line)
+            text_width += w + width
+            text_height = max(text_height, h)
 
-        font_file, font_size = FONT
-        font = ImageFont.truetype(font_file, font_size)
-        text_width, text_height = width, 0
+        text_width += width + text_x + 1
 
-        try:
-            for line in lines:
-                w, h = font.getsize(line)
-                text_width += w + width
-                text_height = max(text_height, h)
+        image = Image.new('RGB', (text_width, max(16, text_height)), (0, 0, 0))
+        draw = ImageDraw.Draw(image)
 
-            text_width += width + text_x + 1
+        offset_left = 0
 
-            image = Image.new('RGB', (text_width, max(16, text_height)), (0, 0, 0))
-            draw = ImageDraw.Draw(image)
+        for line in lines:
+            draw.text((text_x + offset_left, text_y), line, colour, font=font)
 
-            offset_left = 0
+            offset_left += font.getsize(line)[0] + width
 
-            for line in lines:
-                draw.text((text_x + offset_left, text_y), line, colour, font=font)
+        for scroll in range(text_width - width):
+            for x in range(width):
+                for y in range(height):
+                    pixel = image.getpixel((x + scroll, y))
+                    r, g, b = [int(n) for n in pixel]
+                    unicornhathd.set_pixel(width - 1 - x, y, r, g, b)
 
-                offset_left += font.getsize(line)[0] + width
+            unicornhathd.show()
+            time.sleep(0.05)
 
-            for scroll in range(text_width - width):
-                for x in range(width):
-                    for y in range(height):
-                        pixel = image.getpixel((x + scroll, y))
-                        r, g, b = [int(n) for n in pixel]
-                        unicornhathd.set_pixel(width - 1 - x, y, r, g, b)
-
-                unicornhathd.show()
-                time.sleep(0.05)
-            
-            past_element = current_element
-
-        except KeyboardInterrupt:
-            unicornhathd.off()
+    except KeyboardInterrupt:
+        unicornhathd.off()
     
 
