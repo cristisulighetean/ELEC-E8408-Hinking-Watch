@@ -15,7 +15,7 @@ past_element = 0
 
 while True:
     
-    current_element = hdb.get_session()[-1] # this retreives the last element
+    current_element = hdb.get_sessions()[-1] # this retreives the last element
     
     if current_element.id != past_element.id:
 
