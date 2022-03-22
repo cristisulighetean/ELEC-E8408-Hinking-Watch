@@ -12,7 +12,7 @@ BluetoothSerial SerialBT;
 TTGOClass *watch;
 TFT_eSPI *tft;
 BMA *sensor;
-TinyGPSPlus *gps=nullptr;
+TinyGPSPlus *gps = nullptr;
 
 // GPS var
 uint32_t last = 0;
@@ -186,8 +186,6 @@ void setup()
 
 void loop()
 {
-    watch->gpsHandler();
-
     switch (state)
     {
     case 1:
@@ -285,6 +283,7 @@ void loop()
 
         while (1)
         {   
+            watch->gpsHandler();
             /* GPS */
             if (gps->location.isUpdated()) {
                 updateTimeout = millis();
