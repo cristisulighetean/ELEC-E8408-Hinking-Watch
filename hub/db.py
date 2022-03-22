@@ -61,15 +61,31 @@ class HubDatabase:
             lock.release()
 
     def get_sessions(self) -> list[hike.HikeSession]:
-        rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
+        try:
+            lock.acquire()
+            rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
+        finally:
+            lock.release()
+
         return list(map(lambda r: hike.from_list(r), rows))
 
     def get_session(self, session_id: int) -> hike.HikeSession:
-        rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        try:
+            lock.acquire()
+            rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        finally:
+            lock.release()
+
         return hike.from_list(rows[0])
 
     def get_coordinates(self, session_id: int):
-        return self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        try:
+            lock.acquire()
+            res = self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        finally:
+            lock.release()
+
+        return res
 
     def __del__(self):
         self.cur.close()
