@@ -1,7 +1,8 @@
 function update() {
-    var select = document.getElementById("time");
+    var select = document.getElementById("session");
     console.log(select);
     var option = select.options[select.selectedIndex];
+    console.log('OPTION:')
     console.log(option);
 
     if (option.value == "empty") {
@@ -15,25 +16,39 @@ function update() {
     fetch('/sessions/'+option.value)
     .then(response => response.json())
     .then(data => {
-    console.log(data)
-    document.getElementById("km").innerHTML = data[0];
-    document.getElementById("step").innerHTML = data[1];
-    document.getElementById("kcal").innerHTML = data[2];
+        console.log(data)
+        document.getElementById("km").innerHTML = data[1] + " (km)";
+        document.getElementById("step").innerHTML = data[2] + " (steps)";
+        document.getElementById("kcal").innerHTML = Number.parseFloat(data[3]).toFixed(2) + " (kcal)";
     })
-    }
+}
 
 function get_sessions() {
     fetch('/sessions')
     .then(response => response.json())
-    .then(data => {
-    var select = document.getElementById("time");
-    for (const timestamp of data)
-    {
-        var option = document.createElement("option");
-        option.value = timestamp;
-        option.text = timestamp;
-        select.appendChild(option);
-    }
-
+    .then(sessions => {
+        console.log(sessions)
+        var select = document.getElementById("session");
+        for (const sess of sessions)
+        {
+            var option = document.createElement("option");
+            option.value = sess[0];
+            option.text = "Session: " + sess[0];
+            select.appendChild(option);
+        }
     });
+}
+
+function deleteSession() {
+    var select = document.getElementById("session");
+    var option = select.options[select.selectedIndex];
+
+    if (option.value !== "empty") {
+        fetch('/sessions/' + option.value + '/delete')
+        .then(response => response.json())
+        .then(r => {
+            console.log(r);
+        })
+        console.log("Deleting sesssion!")
+    }
 }

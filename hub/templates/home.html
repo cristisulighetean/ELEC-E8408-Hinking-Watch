@@ -13,7 +13,7 @@
         Select a session:
 
         <br>
-      <select name="time" id="time" onchange="update()" group size="10">
+      <select name="session" id="session" onchange="update()" group size="10">
         <option value="empty" selected>empty</option>
       </select>
 
@@ -24,6 +24,9 @@
     <p id="km">-</p>
     <p id="step">-</p>
     <p id="kcal">-</p>
+    <a href="/">
+      <button id="delSessBtn" onclick="deleteSession()">Delete session</button>
+    </a>
     </div>
 
     <copyr>

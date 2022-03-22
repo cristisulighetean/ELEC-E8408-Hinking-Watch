@@ -2,6 +2,12 @@ body {
           background-color: FloralWhite;
           text-align: center;
           }
+
+#delSessBtn {
+  background-color: #a64452;
+  color: white;
+}
+
       h1 {
           font-family: "Helvetica Neue Light", Helvetica, sans-serif;
           font-weight: 300;
