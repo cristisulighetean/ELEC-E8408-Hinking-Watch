@@ -23,7 +23,7 @@ DB_SESSION_TABLE = {
 
 class HubDatabase:
     def __init__(self):
-        self.con = sqlite3.connect('sessions.db')
+        self.con = sqlite3.connect('sessions.db', check_same_thread=False)
         self.cur = self.con.cursor()
 
         for t in (DB_SESSION_TABLE, DB_COORDINATE_TABLE):
@@ -52,9 +52,9 @@ class HubDatabase:
         rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
         return list(map(lambda r: hike.from_list(r), rows))
 
-    def get_session(self, session_id: int):
+    def get_session(self, session_id: int) -> hike.HikeSession:
         rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
-        return list(map(lambda r: hike.from_list(r), rows))
+        return hike.from_list(rows[0])
 
     def get_coordinates(self, session_id: int):
         return self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
