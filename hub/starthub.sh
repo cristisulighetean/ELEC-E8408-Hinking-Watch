@@ -1,6 +1,6 @@
 python3 wserver.py &
 PID_SERVER=$!
-python3 led.py &
+sudo python3 led.py &
 PID_LED=$!
 python3 receiver.py &
 PID_RECEIVER=$!
