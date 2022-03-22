@@ -31,4 +31,4 @@ def delete_session(id):
     print(f'DELETED SESSION WITH ID: {id}')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run('0.0.0.0', debug=True)

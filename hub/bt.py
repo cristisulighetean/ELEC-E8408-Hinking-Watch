@@ -51,7 +51,8 @@ class HubBluetooth:
                         callback(sessions)
                         self.sock.send('r')
                         print("Incoming session saved. Sent confirmation to Watch!")
-                    except (AssertionError, ValueError):
+                    except (AssertionError, ValueError) as e:
+                        print(e)
                         print("Message was corrupted. Aborting...")
             except KeyboardInterrupt:
                 raise KeyboardInterrupt("Shutting down server.")
@@ -74,7 +75,7 @@ class HubBluetooth:
 
             # filtering because we might have a semi-column at the end of the message, right before the new-line character
             parts = list(filter(lambda p: len(p) > 0, m.split(';')))
-            assert len(parts) >= 4, f"MessageProcessingError -> The incoming message doesn't contain enough information: {m}"
+            assert len(parts) >= 3, f"MessageProcessingError -> The incoming message doesn't contain enough information: {m}"
 
             hs = hike.HikeSession()
             hs.id     = int(parts[0])
@@ -85,8 +86,9 @@ class HubBluetooth:
                 sc = c.split(',')
                 assert len(sc) == 2, f"MessageProcessingError -> Unable to process coordinate: {c}"
                 return float(sc[0]), float(sc[1])
-                
-            hs.coords = map(cvt_coord, parts[3:])
+
+            if len(parts) > 3:
+                hs.coords = map(cvt_coord, parts[3:])
 
             return hs
 

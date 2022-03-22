@@ -1,6 +1,7 @@
 import sqlite3
 
 import hike
+import threading
 
 DB_COORDINATE_TABLE = {
     "name": "coordinates",
@@ -21,6 +22,8 @@ DB_SESSION_TABLE = {
     ]
 }
 
+lock = threading.Lock()
+
 class HubDatabase:
     def __init__(self):
         self.con = sqlite3.connect('sessions.db', check_same_thread=False)
@@ -34,30 +37,55 @@ class HubDatabase:
 
     def save(self, s: hike.HikeSession):
         try:
-            self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
-        except sqlite3.IntegrityError:
-            print("WARNING: Session ID already exists in database! Aborting saving current session.")
-        
-        for c in s.coords:
-            self.cur.execute(f"INSERT INTO {DB_COORDINATE_TABLE['name']} VALUES ({s.id}, {c[0]}, {c[1]})")
+            lock.acquire()
 
-        self.con.commit()
+            try:
+                self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
+            except sqlite3.IntegrityError:
+                print("WARNING: Session ID already exists in database! Aborting saving current session.")
+            
+            for c in s.coords:
+                self.cur.execute(f"INSERT INTO {DB_COORDINATE_TABLE['name']} VALUES ({s.id}, {c[0]}, {c[1]})")
+
+            self.con.commit()
+        finally:
+            lock.release()
 
     def delete(self, session_id: int):
-        self.cur.execute(f"DELETE FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}")
-        self.cur.execute(f"DELETE FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}")
-        self.con.commit()
+        try:
+            lock.acquire()
+            self.cur.execute(f"DELETE FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}")
+            self.cur.execute(f"DELETE FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}")
+            self.con.commit()
+        finally:
+            lock.release()
 
     def get_sessions(self) -> list[hike.HikeSession]:
-        rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
+        try:
+            lock.acquire()
+            rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']}").fetchall()
+        finally:
+            lock.release()
+
         return list(map(lambda r: hike.from_list(r), rows))
 
     def get_session(self, session_id: int) -> hike.HikeSession:
-        rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        try:
+            lock.acquire()
+            rows = self.cur.execute(f"SELECT * FROM {DB_SESSION_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        finally:
+            lock.release()
+
         return hike.from_list(rows[0])
 
     def get_coordinates(self, session_id: int):
-        return self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        try:
+            lock.acquire()
+            res = self.cur.execute(f"SELECT lat, long FROM {DB_COORDINATE_TABLE['name']} WHERE session_id = {session_id}").fetchall()
+        finally:
+            lock.release()
+
+        return res
 
     def __del__(self):
         self.cur.close()
