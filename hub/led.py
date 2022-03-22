@@ -68,7 +68,7 @@ while True:
             
             past_element = current_element
 
-    except KeyboardInterrupt:
-        unicornhathd.off()
+        except KeyboardInterrupt:
+            unicornhathd.off()
     
 
