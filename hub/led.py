@@ -2,7 +2,8 @@ import db
 import colorsys
 import time
 import unicornhathd
-import sys 
+import sys
+import hike
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -11,7 +12,8 @@ except ImportError:
 
 hdb = db.HubDatabase()
 
-past_element = 0
+past_element = hike.HikeSession()
+past_element.id = -1
 
 while True:
     
