@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import jsonify
+from flask import Response
 
 import db
 import hike
@@ -29,6 +30,7 @@ def search_parameters(id):
 def delete_session(id):
     hdb.delete(id)
     print(f'DELETED SESSION WITH ID: {id}')
+    return Response(status=202)
 
 if __name__ == "__main__":
     app.run('0.0.0.0', debug=True)
