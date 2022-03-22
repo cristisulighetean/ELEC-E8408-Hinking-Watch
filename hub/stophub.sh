@@ -1,1 +1,0 @@
-while read p; do kill "$p"; done < .bg_processes
