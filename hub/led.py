@@ -2,12 +2,12 @@ import db
 import colorsys
 import time
 import unicornhathd
-from time import exit
+import sys 
 
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
-    exit('This LED display requires the pillow module\nInstall with: sudo pip install pillow\n')
+    sys.exit('This LED display requires the pillow module\nInstall with: sudo pip install pillow\n')
 
 hdb = db.HubDatabase()
 
@@ -23,7 +23,7 @@ while True:
                         f"Distance: {current_element.km}",
                         f"Kcal: {current_element.kcal}"]
 
-        colour = [(255, 0, 0)]
+        colour = (255, 0, 0)
         FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
         
         unicornhathd.rotation(270)
@@ -51,8 +51,8 @@ while True:
 
             offset_left = 0
 
-            for index, line in enumerate(lines):
-                draw.text((text_x + offset_left, text_y), line, colours[index], font=font)
+            for line in lines:
+                draw.text((text_x + offset_left, text_y), line, colour, font=font)
 
                 offset_left += font.getsize(line)[0] + width
 
