@@ -15,7 +15,10 @@ class HikeSession:
     def __repr__(self):
         return f"HikeSession{{{self.id}, {self.km}(km), {self.steps}(steps), {self.kcal:.2f}(kcal)}}"
 
-def from_list(l: list):
+def to_list(s: HikeSession) -> list:
+    return [s.id, s.km, s.steps, s.kcal]
+
+def from_list(l: list) -> HikeSession:
     s = HikeSession()
     s.id = l[0]
     s.km = l[1]
