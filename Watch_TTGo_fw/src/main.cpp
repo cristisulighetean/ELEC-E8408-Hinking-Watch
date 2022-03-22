@@ -219,6 +219,8 @@ void loop()
                     watch->tft->drawString("Hiking Watch",  45, 25, 4);
                     watch->tft->drawString("Press button", 50, 80);
                     watch->tft->drawString("to start session", 40, 110);
+
+                    last = millis();
                 }
 
                 if (sessionSent && incomingChar == 'r')
@@ -227,6 +229,13 @@ void loop()
                     deleteSession();
                     sessionStored = false;
                     sessionSent = false;
+                }
+                else if(sessionSent && incomingChar != 'r'){
+                    if (millis() - updateTimeout > 5000)
+                    {
+                        updateTimeout = millis();
+                        sessionSent = false;
+                    }
                 }
             }
 
@@ -268,9 +277,10 @@ void loop()
         watch->tft->print("Steps: 0");
 
         watch->tft->setCursor(45, 100);
-        watch->tft->print("Distance: 0 km");
+        watch->tft->print("Dist: 0 km");
 
         last = millis();
+        updateTimeout = 0;
 
         // Lat long
         gpsData gps_current;
@@ -321,7 +331,7 @@ void loop()
             if (distance != past_distance)
             {
                 watch->tft->setCursor(45, 100);
-                watch->tft->print("Distance: ");
+                watch->tft->print("Dist: ");
                 char buf[20];
                 sprintf(buf, "%2.2f", distance);
                 watch->tft->print(buf);
