@@ -36,15 +36,21 @@ Represents the process that controls the LED hat on top of the Hub. It has acces
 
 The design of the watch firmware is  based on a finite state machine, and the transition between the states is mainly performed by an interrupt attached to the side button on the watch.
 
-### The main components of the watch firmware are represented by the following functions
+To implement most of the functionalities on the watch, the TTGO library has been used.
+
+### The main watch components 
 
 #### initHikeWatch
 
 Takes care of initalizing the watch objects for the system to work
 
-#### sendSession
+#### sendSessionBT
 
-Orchestrates the sending of the locally stored data via the Bluetooth connection  
+Orchestrates the sending of the locally stored hiking data via the Bluetooth connection  
+
+#### Other components
+
+To save the data onto the watch memory, the `littleFS` library has been used.
 
 
 
