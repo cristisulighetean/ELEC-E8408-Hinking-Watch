@@ -114,12 +114,25 @@ void sendSessionBT()
     sendDataBT(LITTLEFS, "/coord.txt");
 }
 
-float calculateDistance(gpsData current, gpsData past)
+float degreesToRadians(float degrees)
 {
-    // Calculate distance btw 2 points
-    double p1 = pow((current.lat - past.lat), 2);
-    double p2 = pow((current.lng - past.lng), 2);
-    return (float) sqrt(p1+p2);
+    return degrees * 3.14159 / 180;
+}
+
+float distanceInKmBtwEarthCoordinates(gpsData current, gpsData past)
+{
+    uint16_t earthRadiusKm = 6371;
+
+    float dLat = degreesToRadians(current.lat - past.lat);
+    float dLng = degreesToRadians(current.lng - past.lng);
+
+    float lat1Rad = degreesToRadians(past.lat);
+    float lat2Rad = degreesToRadians(current.lat);
+
+    float a = sin(dLat/2) * sin(dLat/2) + sin(dLng/2) * sin(dLng/2) *
+            cos(lat1Rad) * cos(lat2Rad);
+    float c = 2 * atan2(sqrt(a), sqrt(1-a));
+    return earthRadiusKm * c;
 }
 
 void saveCoordinatesDummy(void)
@@ -200,33 +213,51 @@ void loop()
 
         while (1)
         {
-            /* code */
-            /* Bluetooth sync function */
+            /* Bluetooth sync */
             if (SerialBT.available())
             {
                 char incomingChar = SerialBT.read();
-                if (incomingChar == 'c' and sessionStored and not sessionSent){
-                    // Send session via bluetooth
+                if (incomingChar == 'c' and sessionStored and not sessionSent)
+                {
                     sendSessionBT();
                     // Send connection termination char
                     SerialBT.write('\n');
                     sessionSent = true;
+                    
+                }
 
-                    // Dummy delay
+                if (sessionSent) {
+                    // Update timeout before blocking while
+                    updateTimeout = 0;
+                    last = millis();
+                    while(1)
+                    {
+                        if (SerialBT.available())
+                            incomingChar = SerialBT.read();
+                        if (incomingChar == 'r')
+                        {
+                            // Delete session
+                            deleteSession();
+                            sessionStored = false;
+                            sessionSent = false;
+                            break;
+                        }
+                        else
+                        {
+                            if (millis() - updateTimeout > 2000)
+                            {
+                                updateTimeout = millis();
+                                sessionSent = false;
+                                break;
+                            }
+                        }
+                    }                // Dummy delay
                     delay(1000);
                     // Print new message to user
                     watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
                     watch->tft->drawString("Hiking Watch",  45, 25, 4);
                     watch->tft->drawString("Press button", 50, 80);
                     watch->tft->drawString("to start session", 40, 110);
-                }
-
-                if (sessionSent && incomingChar == 'r')
-                {
-                    // Delete session
-                    deleteSession();
-                    sessionStored = false;
-                    sessionSent = false;
                 }
             }
 
@@ -241,6 +272,13 @@ void loop()
                 watch->power->clearIRQ();
             }
             if (state == 2) {
+                if (sessionStored)
+                {
+                    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+                    watch->tft->drawString("Overwriting",  55, 100, 4);
+                    watch->tft->drawString("session", 70, 130);
+                    delay(1000);
+                }
                 break;
             }
         }
@@ -268,9 +306,10 @@ void loop()
         watch->tft->print("Steps: 0");
 
         watch->tft->setCursor(45, 100);
-        watch->tft->print("Distance: 0 km");
+        watch->tft->print("Dist: 0 km");
 
         last = millis();
+        updateTimeout = 0;
 
         // Lat long
         gpsData gps_current;
@@ -305,12 +344,16 @@ void loop()
                 }
             }
 
+            if ((gps_past.lat == 0) && (gps_past.lng == 0))
+            {
+                gps_past.lat = gps_current.lat;
+                gps_past.lng = gps_current.lng;
+            }
+
             // Update covered distance & save to file
             if (gps_current.lat != gps_past.lat && gps_current.lng != gps_past.lng)
             {
-                distance += calculateDistance(gps_current, gps_past); 
-
-                // Save coordinates to file
+                distance += distanceInKmBtwEarthCoordinates(gps_current, gps_past); 
                 saveCoordinates(gps_current); 
 
                 gps_past.lat = gps_current.lat;
@@ -321,7 +364,7 @@ void loop()
             if (distance != past_distance)
             {
                 watch->tft->setCursor(45, 100);
-                watch->tft->print("Distance: ");
+                watch->tft->print("Dist: ");
                 char buf[20];
                 sprintf(buf, "%2.2f", distance);
                 watch->tft->print(buf);
@@ -374,7 +417,7 @@ void loop()
     case 4:
     {
         watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("Ending hike", 45, 100);
+        watch->tft->drawString("Saving hike", 45, 100);
         delay(1000);
         state = 1;  
         break;
