@@ -18,7 +18,7 @@ TinyGPSPlus *gps = nullptr;
 uint32_t last = 0;
 uint32_t updateTimeout = 0;
 
-uint32_t sessionId = 10;
+uint32_t sessionId = 30;
 
 volatile uint8_t state;
 volatile bool irqBMA = false;
@@ -112,6 +112,8 @@ void sendSessionBT()
     SerialBT.write(';');
     // Sending coordinates
     sendDataBT(LITTLEFS, "/coord.txt");
+    // Send connection termination char
+    SerialBT.write('\n');
 }
 
 float degreesToRadians(float degrees)
@@ -211,6 +213,8 @@ void loop()
         watch->tft->drawString("Press button", 50, 80);
         watch->tft->drawString("to start session", 40, 110);
 
+        bool exitSync = false;
+
         while (1)
         {
             /* Bluetooth sync */
@@ -220,45 +224,49 @@ void loop()
                 if (incomingChar == 'c' and sessionStored and not sessionSent)
                 {
                     sendSessionBT();
-                    // Send connection termination char
-                    SerialBT.write('\n');
                     sessionSent = true;
-                    
                 }
 
-                if (sessionSent) {
+                if (sessionSent && sessionStored) {
                     // Update timeout before blocking while
                     updateTimeout = 0;
                     last = millis();
                     while(1)
                     {
+                        updateTimeout = millis();
+
                         if (SerialBT.available())
                             incomingChar = SerialBT.read();
                         if (incomingChar == 'r')
                         {
+                            Serial.println("Got an R");
                             // Delete session
                             deleteSession();
                             sessionStored = false;
                             sessionSent = false;
+                            incomingChar = 'q';
+                            exitSync = true;
                             break;
                         }
-                        else
+                        else if ((millis() - updateTimeout > 2000))
                         {
-                            if (millis() - updateTimeout > 2000)
-                            {
-                                updateTimeout = millis();
-                                sessionSent = false;
-                                break;
-                            }
+                            Serial.println("Waiting for timeout to expire");
+                            updateTimeout = millis();
+                            sessionSent = false;
+                            exitSync = true;
+                            break;
                         }
-                    }                // Dummy delay
-                    delay(1000);
-                    // Print new message to user
-                    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-                    watch->tft->drawString("Hiking Watch",  45, 25, 4);
-                    watch->tft->drawString("Press button", 50, 80);
-                    watch->tft->drawString("to start session", 40, 110);
+                    }
                 }
+            }
+            if (exitSync)
+            {
+                delay(1000);
+                watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+                watch->tft->drawString("Hiking Watch",  45, 25, 4);
+                watch->tft->drawString("Press button", 50, 80);
+                watch->tft->drawString("to start session", 40, 110);
+                exitSync = false;
             }
 
             /*      IRQ     */

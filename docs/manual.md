@@ -48,25 +48,26 @@ After the Hub has been set up, it's time to go for a hike!
 ### Recording hiking session on the watch
 
 1. To start the watch, the side button needs to be pressed for at least 3 seconds
-2. After the welcome messages is shown on the watch, we are ready to go record a hiking session
+2. After the welcome message is shown on the watch, we are ready to go record a hiking session
 3. To start the session, press the side button again
 4. The watch will initialize the session, and you are ready to record your session
 5. On the watch screen, you will be shown the following content:
     - Current step count
     - Current covered distance
-6. When the user desired to end the session, he has to press again on the side button
-7. The user has to sync the session with the Hub, otherwise if he desires to record another one, the last one will be overwritten
+6. When the user desires to end the session, he has to press again the side button
+7. In order for the hiking session to be not overwritten, the user has to sync the watch with the Hub
 
 ### Syncing hiking session with the Hub
 
 1. First, we have to make sure that a hiking session was recorded
-2. The watch has to not record any session in order to sync the last session
-3. To start syncing the session, the user has to be in proximity to the Hub
-4. The Hub will take care of pairing with the watch, and synchronize the session
+2. The watch will sync its last session if there is no ongoing session
+3. To start syncing the session, the user has to be in proximity to the Hub (2 meters without any obstables between)
+4. The Hub will automatically take care of pairing with the watch, and synchronize the session
 5. The watch will show a message when the synchronization was successful
 
 ### Visualizing the sessions on the web page
 
-1. To visualize the sessions, the user has to access the webpage by typing the local IP address of the Raspberry Pi
-2. While on the web page, he can choose the session by clicking on one of the ones situated in the session list on the left hand-side
-3. The user will also be able to delete a session by clicking the delete button
+1. To visualize the sessions, the user has to access the webpage by typing the local IP address of the Raspberry Pi (see Section Setting up the Hub)
+2. While on the web page, the user can visualize and delete stored sessions 
+
+![website_preview](images/website.png)
