@@ -3,11 +3,9 @@ Mini project from the ELEC-E8408 course, Aalto University. which consists of a T
 
 TODO explain project
 
-## Installation
+## Hub installation guide
 
-### Hub
-
-#### Dependencies
+### Dependencies
 
 **Pybluez**
 
@@ -34,7 +32,7 @@ Assuming you are in the root of the project, run:
 
 ---
 
-### Watch
+## Watch installation guide
 TODO Cristian
 
 ## Supported hardware
