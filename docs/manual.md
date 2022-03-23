@@ -15,7 +15,7 @@ The system's goal is to record hiking sessions on the TTGO SmartWatch and synchr
 2. Storing past session on the hub with the ability to
     - Visualize last session characteristics on the LED Display
     - Delete and check past sessions in a web page
-    - The web page also has the capability to show the burned Kcal on for a specific session
+    - The web page and LED display also have the capability to show the burned Kcal on for a specific session
 
 ## Components of the system
 
@@ -25,9 +25,9 @@ The system is comprised by the following components:
 - Raspberry Pi 3B+
 - Pimoroni LED Display
 
-### Elements needed for the system
+### Optional components
 
-Both the user and maintainer will need a computer with an internet connection and a LAN cable to connect the Raspberry Pi to the local network.
+In order to use the website, the user will need a computer with an internet connection and a LAN cable to connect the Raspberry Pi to the local network.
 
 **Note**: The Raspberry Pi and Hub terminology has been used interchangeably.
 
