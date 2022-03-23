@@ -34,7 +34,7 @@ Represents the process that controls the LED hat on top of the Hub. It has acces
 
 ## 2. Watch software design
 
-## Bluetooth communication
+## 3. Bluetooth communication
 ### MAC addresses of the test devices
 Watch: `44:17:93:88:D1:D2`  
 Hub: `B8:27:EB:64:86:8D`
