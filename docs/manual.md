@@ -52,7 +52,6 @@ After the Hub has been set up, it's time to go for a hike!
 3. To start the session, press the side button again
 4. The watch will initalize the session, and you are ready to record your session
 5. On the watch screen you will be shown the following content:
-
     - Current step count
     - Current covered distance
 6. When the user desired to end the session, he has to press again on the side button
