@@ -3,11 +3,11 @@ Mini project from the ELEC-E8408 course, Aalto University. which consists of a T
 
 TODO explain project
 
-## Installation
+![context_diagram](docs/images/context_diagram.png)
 
-### Hub
+## Hub installation guide
 
-#### Dependencies
+### Dependencies
 
 **Pybluez**
 
@@ -32,7 +32,9 @@ Assuming you are in the root of the project, run:
 
 `pip3 install -r hub/requirements.txt`
 
-### Watch
+---
+
+## Watch installation guide
 TODO Cristian
 
 ## Supported hardware
