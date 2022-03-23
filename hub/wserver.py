@@ -10,19 +10,19 @@ app = Flask(__name__)
 hdb = db.HubDatabase()
 
 @app.route('/')
-def url():
+def get_home():
     sessions = hdb.get_sessions() 
     return render_template('home.html', sessions=sessions)
 
 @app.route('/sessions')
-def search_options():
+def get_sessions():
     sessions = hdb.get_sessions() 
     sessions = list(map(lambda s: hike.to_list(s), sessions))
     print(sessions)
     return jsonify(sessions)
 
 @app.route('/sessions/<id>')
-def search_parameters(id):
+def get_session_by_id(id):
     session = hdb.get_session(id)
     return jsonify(hike.to_list(session))
 
