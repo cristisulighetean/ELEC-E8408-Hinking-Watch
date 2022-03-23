@@ -2,7 +2,7 @@
 
 ## Maintainer guide
 
-### Flashing firmaware to the watch
+### Flashing firmware to the watch
 To perform firmware updates to the watch the maintainer will need the following elements:
 
     - Hardware: 
@@ -11,7 +11,7 @@ To perform firmware updates to the watch the maintainer will need the following 
     - Software:
         - esptool (v3.3)
     
-The firmware update will be published on github as a binary file, and it can be flashed to the watch by using the following command:
+The firmware update will be published on GitHub as a binary file, and it can be flashed to the watch by using the following command:
 
 ```sh
 esptool.py --chip esp32 \
@@ -63,7 +63,7 @@ After performing the previous step, the maintainer can end the `ssh` session by 
 
 3. Watch sending session without having GPS data
     - `GOAL`: Test how the Hub will handle receiving a session that has no coordinate data
-    - `HOW`: Sync a hiking session that has not been able to record any coordinates. This can be done by recording a quick session while beeing inside a building. It is hard for the GPS signal to pass through the walls, so it is likely that the watch will not be able to establish any communication with the GPS satelites, and record coordinates.
+    - `HOW`: Sync a hiking session that has not been able to record any coordinates. This can be done by recording a quick session while being inside a building. It is hard for the GPS signal to pass through the walls, so it is likely that the watch will not be able to establish any communication with the GPS satellites, and record coordinates.
     - `EXPECTED RESULT`: The Hub will handle syncing the session, but it will show the distance parameter at 0 Km.
 
 4. Watch disconnecting while sending data to the Hub
