@@ -1,7 +1,7 @@
 # ELEC-E8408-Hiking-Watch
 Mini project from the ELEC-E8408 course, Aalto University. which consists of a TTGO-Watch-2020-V2 and a companion computer (Raspberry Pi)
 
-TODO explain project
+The project is an application for a smart wrist watch that is able to record and display hiking trip statistics
 
 ![context_diagram](docs/images/context_diagram.png)
 
@@ -31,6 +31,16 @@ The required python libraries can be installed from the `hub/requirements.txt` f
 Assuming you are in the root of the project, run:
 
 `pip3 install -r hub/requirements.txt`
+
+### Installing the Hub
+
+```bash
+git clones https://github.com/cristisulighetean/ELEC-E8408-Hinking-Watch.git
+
+cd ELEC-E8408-Hinking-Watch/hub
+
+sudo sh starthub.sh
+```
 
 ---
 
