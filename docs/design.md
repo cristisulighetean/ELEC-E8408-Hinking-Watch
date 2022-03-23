@@ -52,8 +52,6 @@ Orchestrates the sending of the locally stored hiking data via the Bluetooth con
 
 To save the data onto the watch memory, the `littleFS` library has been used.
 
-
-
 ## 3. Bluetooth communication
 ### MAC addresses of the test devices
 Watch: `44:17:93:88:D1:D2`  
