@@ -50,17 +50,17 @@ After the Hub has been set up, it's time to go for a hike!
 1. To start the watch, the side button needs to be pressed for at least 3 seconds
 2. After the welcome messages is shown on the watch, we are ready to go record a hiking session
 3. To start the session, press the side button again
-4. The watch will initalize the session, and you are ready to record your session
-5. On the watch screen you will be shown the following content:
+4. The watch will initialize the session, and you are ready to record your session
+5. On the watch screen, you will be shown the following content:
     - Current step count
     - Current covered distance
 6. When the user desired to end the session, he has to press again on the side button
-7. The user has to sync the session with the Hub, otherwise if the he desires to record another one, the last one will be overwritten
+7. The user has to sync the session with the Hub, otherwise if he desires to record another one, the last one will be overwritten
 
 ### Syncing hiking session with the Hub
 
 1. First, we have to make sure that a hiking session was recorded
 2. The watch has to not record any session in order to sync the last session
-3. To start syncing the session, the user has to be in close proximity to the Hub
-4. The Hub will take care of pairing with the watch, and syncronize the session
-5. The watch will show a message when the syncronization was successful
+3. To start syncing the session, the user has to be in proximity to the Hub
+4. The Hub will take care of pairing with the watch, and synchronize the session
+5. The watch will show a message when the synchronization was successful
