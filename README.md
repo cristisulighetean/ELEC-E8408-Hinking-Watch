@@ -3,6 +3,8 @@ Mini project from the ELEC-E8408 course, Aalto University. which consists of a T
 
 TODO explain project
 
+![context_diagram](docs/images/context_diagram.png)
+
 ## Hub installation guide
 
 ### Dependencies
