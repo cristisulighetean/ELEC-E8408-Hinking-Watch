@@ -3,9 +3,10 @@ import time
 
 import hike
 
+WATCH_BT_MAC = '44:17:93:88:D1:D2'
+WATCH_BT_PORT = 1
+
 class HubBluetooth:
-    WATCH_BT_MAC = '44:17:93:88:D1:D2'
-    WATCH_BT_PORT = 1
     connected = False
     sock = None
     
@@ -80,7 +81,7 @@ class HubBluetooth:
             hs = hike.HikeSession()
             hs.id     = int(parts[0])
             hs.steps  = int(parts[1])
-            hs.km     = int(parts[2])
+            hs.km     = float(parts[2])
 
             def cvt_coord(c):
                 sc = c.split(',')
@@ -93,24 +94,3 @@ class HubBluetooth:
             return hs
 
         return list(map(mtos, messages))
-
-
-# """
-# A simple Python script to send messages to a sever over Bluetooth
-# using PyBluez (with Python 2).
-# """
-
-# import bluetooth
-# import time
-
-# serverMACAddress = '44:17:93:88:D1:D2'
-# port = 1
-# s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-# s.connect((serverMACAddress, port))
-
-# print("connection has been made! yeah")
-
-
-
-# for i in range(10):
-#     time.sleep(0.2)
