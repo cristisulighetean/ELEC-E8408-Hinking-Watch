@@ -34,6 +34,20 @@ Represents the process that controls the LED hat on top of the Hub. It has acces
 
 ## 2. Watch software design
 
+The design of the watch firmware is  based on a finite state machine, and the transition between the states is mainly performed by an interrupt attached to the side button on the watch.
+
+### The main components of the watch firmware are represented by the following functions
+
+#### initHikeWatch
+
+Takes care of initalizing the watch objects for the system to work
+
+#### sendSession
+
+Orchestrates the sending of the locally stored data via the Bluetooth connection 
+
+
+
 ## 3. Bluetooth communication
 ### MAC addresses of the test devices
 Watch: `44:17:93:88:D1:D2`  
