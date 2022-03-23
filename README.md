@@ -6,6 +6,7 @@ TODO explain project
 ## Installation
 
 ### Hub
+---
 
 #### Dependencies
 
