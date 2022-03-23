@@ -1,7 +1,7 @@
 # Manual
 
 The goal of this document is to familiarize the user with the system and to help with the setup process.
-The first part of the document will describe the steps that the user is required to accomplish in order for the system to be up and running. The second part will depict the maintainer's operations on the system.
+The first part of the document will describe the steps that the user is required to accomplish in order for the system to be up and running. The second part will decribe the how operate the hub and the watch.
 
 ## General description
 
@@ -64,3 +64,9 @@ After the Hub has been set up, it's time to go for a hike!
 3. To start syncing the session, the user has to be in proximity to the Hub
 4. The Hub will take care of pairing with the watch, and synchronize the session
 5. The watch will show a message when the synchronization was successful
+
+### Visualizing the sessions on the web page
+
+1. To visualize the sessions, the user has to access the webpage by typing the local IP address of the Raspberry Pi
+2. While on the web page, he can choose the session by clicking on one of the ones situated in the session list on the left hand-side
+3. The user will also be able to delete a session by clicking the delete button
