@@ -6,7 +6,6 @@ TODO explain project
 ## Installation
 
 ### Hub
----
 
 #### Dependencies
 
@@ -32,6 +31,8 @@ The required python libraries can be installed from the `hub/requirements.txt` f
 Assuming you are in the root of the project, run:
 
 `pip3 install -r hub/requirements.txt`
+
+---
 
 ### Watch
 TODO Cristian
