@@ -37,8 +37,8 @@ Both the user and maintainer will need a computer with an internet connection an
     - It is recommended to use an Ethernet cable of category 5 or better
 2. Connect the Raspberry Pi to power via the provided power supply
 3. Use a tool like [fing](https://www.fing.com/) to find the local IP address of the Raspberry Pi
-4. Access the webpage by using [Google Chrome](https://www.google.com/chrome/) and type the local IP address of the Raspberry Pi and the ':5000' at the end
-    - e.g. '192.168.1.110:5000'
+4. Access the webpage by using [Google Chrome](https://www.google.com/chrome/) and type the local IP address of the Raspberry Pi and the `:5000` at the end
+    - e.g. `192.168.1.110:5000`
 5. If the web browser is able to open the webpage, then the setup has been successful
 
 ## Using the Hub and the Watch
