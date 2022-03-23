@@ -1,26 +1,48 @@
-# ELEC-E8408-Hinking-Watch-
-Mini project from the ELEC-E8408 course which consists of a TTGO-Watch-2020-V2 and a companion computer (Raspberry Pi)
+# ELEC-E8408-Hiking-Watch
+Mini project from the ELEC-E8408 course, Aalto University. which consists of a TTGO-Watch-2020-V2 and a companion computer (Raspberry Pi)
 
+TODO explain project
 
-# Bluetooth communication between the Hub and the Watch 
-## MAC addresses
-Watch: `44:17:93:88:D1:D2`  
-Hub: `B8:27:EB:64:86:8D`
+## Installation
 
-## Pairing
-When the Hub connects successfully to the Watch, it will send one `c` (ASCII character) to notify the Watch of the connection.
+### Hub
 
-## Synchronization data
-After pairing, the Watch will send the hiking session to the Hub, if any hiking session is recorded.
-If the session was successfully send to the Hub, the Watch will delete it.
-The Watch can only synchronize if it is not recording any session.
+#### Dependencies
 
-The following represents the message that the Watch will send to the Hub.
-```python
-# id;steps;km;lat1,long1;lat2,long2;...\n
-b'4;2425;324;64.83458747762428,24.83458747762428;...,...\n'
+**Pybluez**
+
+In order to install `pybluez` on an RPi, you have to install some of its dependencies.
+
+```sh
+sudo apt-get install libbluetooth-dev
+sudo apt-get install python-dev
+sudo pip install PyBluez
 ```
-- The newline represents the end of the session synchronization message
 
-After the Hub successfully receives the session data the Hub sends one `r` (ASCII character) that represents *received*
-(The watch should have a timeout of e.g., 10 seconds.)
+**UnicornhatHD python library**
+
+To make the LED hat work, you have to install the `unicornhathd` python library. The library has to be installed as a super user.
+
+`sudo pip3 install unicornhathd==0.0.4`
+
+**Other**
+
+The required python libraries can be installed from the `hub/requirements.txt` file.
+Assuming you are in the root of the project, run:
+
+`pip3 install -r hub/requirements.txt`
+
+### Watch
+TODO Cristian
+
+## Supported hardware
+TODO Cristian
+
+## Project layout
+
+
+## Maintainers
+Oliver Lagerroos  
+Simon Nordström  
+Gabor Pelesz  
+Cristian Sulighetean  
