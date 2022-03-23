@@ -18,7 +18,7 @@ TinyGPSPlus *gps = nullptr;
 uint32_t last = 0;
 uint32_t updateTimeout = 0;
 
-uint32_t sessionId = 10;
+uint32_t sessionId = 30;
 
 volatile uint8_t state;
 volatile bool irqBMA = false;
