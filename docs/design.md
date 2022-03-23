@@ -1,6 +1,6 @@
 # Design documentation
 
-## 1.Hub software design
+## 1. Hub software design
 The design for the system consists of three major components:
 - Receiver
 - LED controller
