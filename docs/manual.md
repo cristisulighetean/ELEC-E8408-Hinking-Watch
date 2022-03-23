@@ -26,7 +26,7 @@ Note: The Raspberry Pi and Hub terminology has been used interchangeably.
 ### Setting up the Hub
 
 1. Connect the Raspberry Pi to the local network via an Ethernet cable
-1. 1 It is recommended to use an Ethernet cable of category 5 or better
+1.1 It is recommended to use an Ethernet cable of category 5 or better
 2. Connect the Raspberry Pi to power via the provided power supply
 3. Use a tool like [fing](https://www.fing.com/) to find the local IP address of the Raspberry Pi
 4. Access the webpage by using [Google Chrome](https://www.google.com/chrome/) and type the local IP address of the Raspberry Pi and the ':5000' at the end
