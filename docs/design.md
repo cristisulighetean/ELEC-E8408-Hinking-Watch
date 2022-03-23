@@ -44,7 +44,7 @@ Takes care of initalizing the watch objects for the system to work
 
 #### sendSession
 
-Orchestrates the sending of the locally stored data via the Bluetooth connection 
+Orchestrates the sending of the locally stored data via the Bluetooth connection  
 
 
 
