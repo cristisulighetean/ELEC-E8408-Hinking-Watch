@@ -32,6 +32,21 @@ Represents the process that serves the website. It connects to the database, ret
 #### LedHat
 Represents the process that controls the LED hat on top of the Hub. It has access to the database and it polls the database for any changes, after it has successfully drawn the currently retreived session.
 
+### Implementation details
+
+The Hub is serving three different applications:
+- Handling the bluetooth communication with the Watch
+- Displaying the latest session on the LED hat
+- Serving a website to display all the sessions in the database and create the option to delete any of them.
+
+All of these are done by running three Python programs separately in separate processes.
+
+**Extendability:**
+
+- The Bluetooth communication module and the Database module was designed so they can be reused by different programs in case of extension.
+- The website is using the Database module and its UI is independent on any other modules, thus can be easily extended or redesigned.
+- The LED hat is using the Database module similarly to the web server, which shows how easy it is to add any Views to the systems.
+
 ## 2. Watch software design
 
 The design of the watch firmware is  based on a finite state machine, and the transition between the states is mainly performed by an interrupt attached to the side button on the watch.
