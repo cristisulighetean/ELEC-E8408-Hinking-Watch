@@ -25,7 +25,7 @@ while True:
         colour = (255, 0, 0)
         FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
         
-        unicornhathd.rotation(180)
+        unicornhathd.rotation(90)
         unicornhathd.brightness(0.6)
 
         width, height = unicornhathd.get_shape()
