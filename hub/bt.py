@@ -80,6 +80,8 @@ class HubBluetooth:
                         callback(sessions)
                         self.sock.send('r')
 
+                        print(f"Saved. 'r' sent to the socket!")
+
                     except (AssertionError, ValueError) as e:
                         print(e)
                         print("WARNING: Receiver -> Message was corrupted. Aborting...")
