@@ -29,7 +29,7 @@ class HubBluetooth:
                 print("Waiting for connection...")
                 try:
                     self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-                    self.sock.connect((self.WATCH_BT_MAC, self.WATCH_BT_PORT))
+                    self.sock.connect((WATCH_BT_MAC, WATCH_BT_PORT))
                     self.sock.settimeout(2)
                     self.connected = True
                     self.sock.send('c')
