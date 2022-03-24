@@ -34,7 +34,7 @@ Represents the process that controls the LED hat on top of the Hub. It has acces
 
 ### Database Table design
 
-![Database design](docs/images/db.png)
+![Database design](images/db.png)
 
 ### Implementation details
 
