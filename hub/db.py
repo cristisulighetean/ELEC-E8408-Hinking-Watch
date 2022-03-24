@@ -56,10 +56,16 @@ class HubDatabase:
         self.con.commit()
 
     def save(self, s: hike.HikeSession):
+        sessions = self.get_sessions()
+
+        if len(sessions) > 0:
+            s.id = sorted(lambda sess: sess.id, sessions)[-1].id + 1
+        else:
+            s.id = 1
+
         try:
             self.lock.acquire()
 
-            s.id = sorted(lambda sess: sess.id, self.get_sessions())[-1].id + 1
 
             try:
                 self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
