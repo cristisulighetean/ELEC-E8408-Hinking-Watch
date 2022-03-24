@@ -32,6 +32,10 @@ Represents the process that serves the website. It connects to the database, ret
 #### LedHat
 Represents the process that controls the LED hat on top of the Hub. It has access to the database and it polls the database for any changes, after it has successfully drawn the currently retreived session.
 
+### Database Table design
+
+![Database design](docs/images/db.png)
+
 ### Implementation details
 
 The Hub is serving three different applications:
