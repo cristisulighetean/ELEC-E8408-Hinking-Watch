@@ -40,12 +40,12 @@ After connecting via `ssh`, the maintainer needs to stop by rebooting the Hub wi
     
     sudo reboot now
 
-And then reconnect via `ssh` and perform the following command
+And then reconnect via `ssh` and perform the following commands
 
-    cd ELEC-E8408-Hinking-Watch-/
+    cd ELEC-E8408-Hinking-Watch-/hub
     git pull
-    chmod +x startup.sh
-    sudo ./startuphub.sh
+    chmod +x starthub.sh
+    sudo ./starthub.sh
 
 After performing the previous step, the maintainer can end the `ssh` session by typing `exit` in the terminal.
 
