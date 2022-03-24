@@ -13,56 +13,59 @@ hdb = db.HubDatabase()
 
 while True:
     
-    current_element = hdb.get_sessions()[-1] # this retreives the last element
-
-    lines = [f"Steps: {current_element.steps}",
-                    f"Distance: {current_element.km}",
-                    f"Kcal: {current_element.kcal}"]
-
-    colour = (255, 0, 0)
-    FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
+    current_elements = hdb.get_sessions()
     
-    unicornhathd.rotation(180)
-    unicornhathd.brightness(0.6)
+    if len(current_elements) > 0:
+        current_element = current_elements[-1]
 
-    width, height = unicornhathd.get_shape()
+        lines = [f"Steps: {current_element.steps}",
+                        f"Distance: {current_element.km}",
+                        f"Kcal: {current_element.kcal}"]
 
-    text_x = width
-    text_y = 2
+        colour = (255, 0, 0)
+        FONT = ('/usr/share/fonts/truetype/freefont/FreeSansBold.ttf', 12)
+        
+        unicornhathd.rotation(180)
+        unicornhathd.brightness(0.6)
 
-    font_file, font_size = FONT
-    font = ImageFont.truetype(font_file, font_size)
-    text_width, text_height = width, 0
+        width, height = unicornhathd.get_shape()
 
-    try:
-        for line in lines:
-            w, h = font.getsize(line)
-            text_width += w + width
-            text_height = max(text_height, h)
+        text_x = width
+        text_y = 2
 
-        text_width += width + text_x + 1
+        font_file, font_size = FONT
+        font = ImageFont.truetype(font_file, font_size)
+        text_width, text_height = width, 0
 
-        image = Image.new('RGB', (text_width, max(16, text_height)), (0, 0, 0))
-        draw = ImageDraw.Draw(image)
+        try:
+            for line in lines:
+                w, h = font.getsize(line)
+                text_width += w + width
+                text_height = max(text_height, h)
 
-        offset_left = 0
+            text_width += width + text_x + 1
 
-        for line in lines:
-            draw.text((text_x + offset_left, text_y), line, colour, font=font)
+            image = Image.new('RGB', (text_width, max(16, text_height)), (0, 0, 0))
+            draw = ImageDraw.Draw(image)
 
-            offset_left += font.getsize(line)[0] + width
+            offset_left = 0
 
-        for scroll in range(text_width - width):
-            for x in range(width):
-                for y in range(height):
-                    pixel = image.getpixel((x + scroll, y))
-                    r, g, b = [int(n) for n in pixel]
-                    unicornhathd.set_pixel(width - 1 - x, y, r, g, b)
+            for line in lines:
+                draw.text((text_x + offset_left, text_y), line, colour, font=font)
 
-            unicornhathd.show()
-            time.sleep(0.05)
+                offset_left += font.getsize(line)[0] + width
 
-    except KeyboardInterrupt:
-        unicornhathd.off()
+            for scroll in range(text_width - width):
+                for x in range(width):
+                    for y in range(height):
+                        pixel = image.getpixel((x + scroll, y))
+                        r, g, b = [int(n) for n in pixel]
+                        unicornhathd.set_pixel(width - 1 - x, y, r, g, b)
+
+                unicornhathd.show()
+                time.sleep(0.05)
+
+        except KeyboardInterrupt:
+            unicornhathd.off()
     
 
