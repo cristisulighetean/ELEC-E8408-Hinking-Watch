@@ -1,7 +1,11 @@
 # ELEC-E8408-Hiking-Watch
 Mini project from the ELEC-E8408 course, Aalto University. which consists of a TTGO-Watch-2020-V2 and a companion computer (Raspberry Pi)
 
-The project is an application for a smart wrist watch that is able to record and display hiking trip statistics
+The project is a system consisting of a smart watch (Watch) application that is able to record and display hiking trip statistics, and external device (Hub) that is able to synchronize hiking session data from the watch to store it, manage it, and display the history. The Watch and the Hub is communicating via Bluetooth by a very simple protocol.
+
+With the Watch, the user is able to record hiking sessions, observe the current session data (step count, distance in km), and save one session locally.
+
+The Hub will automatically synchronize to the Watch if they are nearby each other. The incoming sessions will be stored on the Hub inside a database. The Hub serves a website through which the stored session data can be observed, and individual sessions can be deleted. On top of the Hub there is an LED matrix which displays the latest session.
 
 ![context_diagram](docs/images/context_diagram.png)
 
