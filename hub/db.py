@@ -59,7 +59,7 @@ class HubDatabase:
         sessions = self.get_sessions()
 
         if len(sessions) > 0:
-            s.id = sorted(lambda sess: sess.id, sessions)[-1].id + 1
+            s.id = sorted(sessions, key=lambda sess: sess.id)[-1].id + 1
         else:
             s.id = 1
 
