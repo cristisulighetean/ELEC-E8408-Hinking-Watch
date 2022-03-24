@@ -59,6 +59,8 @@ class HubDatabase:
         try:
             self.lock.acquire()
 
+            s.id = sorted(lambda sess: sess.id, self.get_sessions())[-1].id + 1
+
             try:
                 self.cur.execute(f"INSERT INTO {DB_SESSION_TABLE['name']} VALUES ({s.id}, {s.km}, {s.steps}, {s.kcal})")
             except sqlite3.IntegrityError:
