@@ -73,7 +73,7 @@ void initHikeWatch()
     }, FALLING);
 
     //!Clear IRQ unprocessed first
-    watch->power->enableIRQ(AXP202_PEK_SHORTPRESS_IRQ, true);
+    watch->power->enableIRQ(AXP202_PEK_LONGPRESS_IRQ, true);
     watch->power->clearIRQ();
 
     return;
